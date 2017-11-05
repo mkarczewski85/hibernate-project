@@ -1,5 +1,12 @@
 package db_creator;
 
+import db_repository.WordEntryRepository;
+import hibernate.utils.HibernateUtil;
+import model.WordEntry;
+import model.WordEntryBuilder;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -41,5 +48,30 @@ public class WordDatabaseCreator {
         }
     }
 
+    public void createBulkDatabase(String filepath) {
+        List<WordEntry> entryList = getListWordsFromFile(filepath);
+
+        Session session = null;
+        try {
+            session = HibernateUtil.openSession();
+            Transaction tx = session.beginTransaction();
+            for (int i = 0; i < entryList.size(); i++) {
+                session.save(entryList.get(i));
+                if (i % 50 == 0) {
+                    session.flush();
+                    session.clear();
+                }
+            }
+            tx.commit();
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+    }
 
 }
