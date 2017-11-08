@@ -51,7 +51,7 @@ public class WordEntryRepository {
 
         try {
             session = HibernateUtil.openSession();
-            String hql = "SELECT e FROM WordEntry e WHERE LOWER(e.sortedChars) IN (:chars) AND e.points > :score";
+            String hql = "SELECT e FROM WordEntry e WHERE (LOWER(e.sortedChars) IN (:chars)) AND e.points > :score";
             Query query = session.createQuery(hql)
                     .setParameterList("chars", charsList)
                     .setParameter("score", score);
@@ -65,5 +65,32 @@ public class WordEntryRepository {
             }
         }
     }
+
+    public static List<WordEntry> findWordsByCharsAndLetter(Set<String> charsList, char letter, boolean option) {
+        Session session = null;
+
+        try {
+            session = HibernateUtil.openSession();
+            String hql;
+
+            if (option) {
+                hql = "SELECT e FROM WordEntry e WHERE (LOWER(e.sortedChars) IN (:chars)) AND e.word LIKE CONCAT(:letter, '%')";
+            } else {
+                hql = "SELECT e FROM WordEntry e WHERE (LOWER(e.sortedChars) IN (:chars)) AND e.word LIKE CONCAT('%', :letter)";
+            }
+            Query query = session.createQuery(hql)
+                    .setParameterList("chars", charsList)
+                    .setParameter("letter", letter);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+    }
+
 
 }

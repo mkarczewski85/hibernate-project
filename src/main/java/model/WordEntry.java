@@ -26,7 +26,7 @@ public class WordEntry implements Serializable{
 
     @Override
     public String toString() {
-        return word;
+        return word + " " + points;
     }
 
 }

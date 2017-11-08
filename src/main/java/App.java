@@ -1,27 +1,39 @@
 import algorithm.PowerSet;
 import model.WordEntry;
 import db_repository.WordEntryRepository;
+
 import java.util.*;
 
 public class App {
 
     public static void main(String[] args) {
 
-        char[] charArr = {'i', 'm', 'p', 'r', 'a', 's', 'ł'};
-
+        char start = 'a';
         Scanner scanner = new Scanner(System.in);
 
-        String input = scanner.nextLine();
+        while (true){
+            String input = scanner.nextLine();
 
-        Set<String> subsets = PowerSet.powerSet(input);
+            long startTime = System.currentTimeMillis();
 
-        List<WordEntry> wordsByChars = WordEntryRepository.findWordsByChars(subsets);
+            Set<String> subsets = PowerSet.powerSet(input);
 
-        if (!wordsByChars.isEmpty()) {
-            for (WordEntry entry : wordsByChars) {
-                System.out.println(entry.toString());
+            System.out.println(System.currentTimeMillis() - startTime);
+
+            startTime = System.currentTimeMillis();
+
+            List<WordEntry> wordsByChars = WordEntryRepository.findWordsByCharsAndLetter(subsets, start, false);
+
+            if (!wordsByChars.isEmpty()) {
+                for (WordEntry entry : wordsByChars) {
+                    System.out.println(entry.toString());
+                }
             }
+
+            System.out.println(System.currentTimeMillis() - startTime);
         }
+
+
 
     }
 
